@@ -23,25 +23,44 @@ export function PaymentPopup({ open, onClose, total, onComplete }: PaymentPopupP
   const [method, setMethod] = useState<"mobile" | "bank" | "card" | null>(null);
   const [processing, setProcessing] = useState(false);
   const [done, setDone] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handlePay = () => {
+  const handlePay = async () => {
     setProcessing(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch("/api/interswitchPayment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: total,
+          customerId: "customer123", // replace with actual logged-in user ID
+          method, // optional: send chosen method to backend
+        }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setMessage(`Payment failed: ${data.error}`);
+      } else {
+        setDone(true);
+        setMessage("Payment successful!");
+        setTimeout(() => {
+          onComplete(); // clears cart + marks order complete
+          setDone(false);
+          setMethod(null);
+        }, 1500);
+      }
+    } catch (err) {
+      setMessage("Error initiating payment");
+    } finally {
       setProcessing(false);
-      setDone(true);
-      setTimeout(() => {
-        onComplete();
-        setDone(false);
-        setMethod(null);
-      }, 1500);
-    }, 2000);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-display">Payment — ${total.toFixed(2)}</DialogTitle>
+          <DialogTitle className="font-display">Payment — ₦{total.toFixed(2)}</DialogTitle>
         </DialogHeader>
 
         {done ? (
@@ -66,7 +85,13 @@ export function PaymentPopup({ open, onClose, total, onComplete }: PaymentPopupP
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">Select mobile payment provider</p>
             {mobileOptions.map((opt) => (
-              <Button key={opt.name} variant="outline" className="w-full justify-start gap-3" onClick={handlePay} disabled={processing}>
+              <Button
+                key={opt.name}
+                variant="outline"
+                className="w-full justify-start gap-3"
+                onClick={handlePay}
+                disabled={processing}
+              >
                 <span className={`h-3 w-3 rounded-full ${opt.color}`} />
                 {opt.name}
               </Button>
@@ -77,7 +102,13 @@ export function PaymentPopup({ open, onClose, total, onComplete }: PaymentPopupP
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">Select your bank</p>
             {bankOptions.map((bank) => (
-              <Button key={bank} variant="outline" className="w-full justify-start" onClick={handlePay} disabled={processing}>
+              <Button
+                key={bank}
+                variant="outline"
+                className="w-full justify-start"
+                onClick={handlePay}
+                disabled={processing}
+              >
                 {bank}
               </Button>
             ))}
@@ -92,11 +123,13 @@ export function PaymentPopup({ open, onClose, total, onComplete }: PaymentPopupP
             </div>
             <Input placeholder="Cardholder name" />
             <Button className="w-full" onClick={handlePay} disabled={processing}>
-              {processing ? "Processing..." : `Pay $${total.toFixed(2)}`}
+              {processing ? "Processing..." : `Pay ₦${total.toFixed(2)}`}
             </Button>
             <Button variant="ghost" size="sm" onClick={() => setMethod(null)}>← Back</Button>
           </div>
         )}
+
+        {message && <p className="mt-2 text-sm text-red-500">{message}</p>}
       </DialogContent>
     </Dialog>
   );
