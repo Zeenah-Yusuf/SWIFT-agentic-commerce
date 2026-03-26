@@ -5,10 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Zap, Loader2, ArrowRight, ShieldCheck, Mail, Lock, UserPlus } from "lucide-react";
+import { Zap, Loader2, ArrowRight, ShieldCheck, Mail, UserPlus, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type Mode = "login" | "signup" | "admin";
+type Mode = "login" | "signup" | "admin" | "whatsapp";
 
 export default function Login() {
   const [mode, setMode] = useState<Mode>("login");
@@ -16,6 +16,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [adminCode, setAdminCode] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const { login, signup, adminLogin } = useAuth();
   const navigate = useNavigate();
@@ -41,6 +42,23 @@ export default function Login() {
           toast({ title: "Account created! Welcome to SWIFT." });
           navigate("/");
         }
+      } else if (mode === "whatsapp") {
+        try {
+          const res = await fetch("/api/whatsappVerification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ phoneNumber }),
+          });
+          const data = await res.json();
+          if (data.error) {
+            toast({ title: "Verification failed", description: data.error, variant: "destructive" });
+          } else {
+            toast({ title: "Code sent via WhatsApp", description: "Check your WhatsApp for the code." });
+            navigate("/"); // or navigate to a verification page
+          }
+        } catch {
+          toast({ title: "Error", description: "Could not send code", variant: "destructive" });
+        }
       } else {
         const res = await login(email, password);
         if (res.error) {
@@ -59,16 +77,13 @@ export default function Login() {
     login: { icon: <Mail className="h-6 w-6" />, heading: "Welcome back", sub: "Sign in to your SWIFT account" },
     signup: { icon: <UserPlus className="h-6 w-6" />, heading: "Join SWIFT", sub: "Create your account and start shopping smarter" },
     admin: { icon: <ShieldCheck className="h-6 w-6" />, heading: "Admin Access", sub: "Enter your admin authorization code" },
+    whatsapp: { icon: <Phone className="h-6 w-6" />, heading: "Login with WhatsApp", sub: "Receive a code via WhatsApp" },
   };
 
   return (
     <Layout>
       <section className="flex min-h-[70vh] items-center justify-center px-4 py-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <div className="overflow-hidden rounded-2xl border bg-card shadow-xl shadow-primary/5">
             {/* Header gradient */}
             <div className="bg-gradient-to-br from-primary to-accent px-8 py-8 text-center text-primary-foreground">
@@ -99,6 +114,18 @@ export default function Login() {
                           className="h-12"
                         />
                       </div>
+                    ) : mode === "whatsapp" ? (
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-foreground">Phone Number</label>
+                        <Input
+                          type="text"
+                          placeholder="+2348012345678"
+                          value={phoneNumber}
+                          onChange={(e) => setPhoneNumber(e.target.value)}
+                          required
+                          className="h-12"
+                        />
+                      </div>
                     ) : (
                       <>
                         {mode === "signup" && (
@@ -123,7 +150,13 @@ export default function Login() {
                 <Button type="submit" className="h-12 w-full gap-2 text-base font-semibold" disabled={loading}>
                   {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (
                     <>
-                      {mode === "admin" ? "Authorize" : mode === "signup" ? "Create Account" : "Sign In"}
+                      {mode === "admin"
+                        ? "Authorize"
+                        : mode === "signup"
+                        ? "Create Account"
+                        : mode === "whatsapp"
+                        ? "Send Code"
+                        : "Sign In"}
                       <ArrowRight className="h-4 w-4" />
                     </>
                   )}
@@ -146,11 +179,5 @@ export default function Login() {
                     <ShieldCheck className="mr-1 inline h-3 w-3" /> Admin access
                   </button>
                 )}
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </section>
-    </Layout>
-  );
-}
+                {mode !== "whatsapp" && (
+                  <button onClick={() => setMode("whatsapp")} className="text-sm text-muted-foreground transition-colors hover:text
