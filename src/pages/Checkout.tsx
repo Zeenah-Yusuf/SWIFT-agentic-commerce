@@ -3,14 +3,14 @@ import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import { PaymentPopup } from "@/components/checkout/PaymentPopup";
 import { CheckCircle2 } from "lucide-react";
 import { Link, Navigate } from "react-router-dom";
 
 export default function Checkout() {
   const { items, total, clearCart } = useCart();
-  const [payOpen, setPayOpen] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const orderId = `SWF-${Date.now().toString().slice(-8)}`;
 
   if (items.length === 0 && !orderComplete) return <Navigate to="/cart" />;
@@ -34,12 +34,40 @@ export default function Checkout() {
 
   const retailers = [...new Set(items.map((i) => i.retailer))];
 
+  const handlePayment = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/interswitchPayment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: total,
+          customerId: "customer123", // replace with actual logged-in user ID
+        }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        setMessage(`Payment failed: ${data.error}`);
+      } else {
+        setMessage("Payment successful!");
+        clearCart();
+        setOrderComplete(true);
+      }
+    } catch (err) {
+      setMessage("Error initiating payment");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
       <section className="py-16">
         <div className="container max-w-3xl">
           <h1 className="font-display text-4xl font-bold text-foreground">Checkout</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Enter your details once — SWIFT handles checkout across {retailers.length} retailers.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Enter your details once — SWIFT handles checkout across {retailers.length} retailers.
+          </p>
 
           <div className="mt-8 grid gap-8 md:grid-cols-2">
             <div className="space-y-6">
@@ -64,8 +92,12 @@ export default function Checkout() {
                 <div className="space-y-3">
                   {items.map((item) => (
                     <div key={item.id} className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">{item.image} {item.name} ×{item.quantity}</span>
-                      <span className="font-medium text-foreground">${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="text-muted-foreground">
+                        {item.image} {item.name} ×{item.quantity}
+                      </span>
+                      <span className="font-medium text-foreground">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -79,14 +111,20 @@ export default function Checkout() {
                   Retailers: {retailers.join(", ")}
                 </div>
 
-                <Button className="mt-4 w-full" size="lg" onClick={() => setPayOpen(true)}>Pay Now</Button>
+                <Button
+                  className="mt-4 w-full"
+                  size="lg"
+                  onClick={handlePayment}
+                  disabled={loading}
+                >
+                  {loading ? "Processing..." : "Pay Now"}
+                </Button>
+                {message && <p className="mt-2 text-sm text-red-500">{message}</p>}
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      <PaymentPopup open={payOpen} onClose={() => setPayOpen(false)} total={total} onComplete={() => { setPayOpen(false); clearCart(); setOrderComplete(true); }} />
     </Layout>
   );
 }
