@@ -222,7 +222,7 @@ export default function Agent() {
                               )}
                             </div>
                             <div className="text-right shrink-0">
-                              <p className="font-bold text-primary">${p.price.toFixed(2)}</p>
+                              <p className="font-bold text-primary">{formatNaira(p.price)}</p>
                               <Button size="sm" variant="outline" className="mt-1 h-7 rounded-lg text-xs" onClick={() => { addItem(p); toast({ title: `Added ${p.name}` }); }}>
                                 <ShoppingCart className="mr-1 h-3 w-3" /> Add
                               </Button>

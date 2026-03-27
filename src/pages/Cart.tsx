@@ -62,7 +62,7 @@ export default function Cart() {
           <div className="mt-8 rounded-xl border bg-card p-6">
             <div className="flex items-center justify-between">
               <span className="font-display text-lg font-semibold text-foreground">Total</span>
-              <span className="font-display text-2xl font-bold text-primary">${total.toFixed(2)}</span>
+              <span className="font-display text-2xl font-bold text-primary">{formatNaira(total)}</span>
             </div>
             <Link to="/checkout">
               <Button className="mt-4 w-full gap-2" size="lg">Proceed to Checkout <ArrowRight className="h-4 w-4" /></Button>

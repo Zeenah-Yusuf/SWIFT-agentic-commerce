@@ -114,7 +114,7 @@ export default function Index() {
             className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
           >
             {[
-              { emoji: "🛒", title: "Multi-Retailer", desc: "Products from Amazon, Walmart, Party City & Costco in one unified cart." },
+              { emoji: "🛒", title: "Multi-Retailer", desc: "Products from Jumia, Konga, Shoprite, SPAR & more — in one unified cart." },
               { emoji: "🤖", title: "AI-Powered Agent", desc: "Conversational agents that understand intent and shop autonomously." },
               { emoji: "📊", title: "Smart Ranking", desc: "Transparent scoring: cost 30%, delivery 30%, preference 20%, coherence 20%." },
               { emoji: "⚡", title: "Fast Checkout", desc: "One payment, one address — SWIFT orchestrates across all stores." },
