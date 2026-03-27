@@ -104,7 +104,7 @@ export default function Checkout() {
                         {item.name} ×{item.quantity}
                       </span>
                       <span className="font-medium text-foreground">
-                        ₦{(item.price * item.quantity).toFixed(2)}
+                        {formatNaira(item.price * item.quantity)}
                       </span>
                     </div>
                   ))}
