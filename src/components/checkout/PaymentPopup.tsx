@@ -28,7 +28,7 @@ export function PaymentPopup({ open, onClose, total, onComplete }: PaymentPopupP
       merchant_code: import.meta.env.VITE_INTERSWITCH_MERCHANT_CODE,
       pay_item_id: import.meta.env.VITE_INTERSWITCH_PAY_ITEM_ID,
       txn_ref: txnRef,
-      site_redirect_url: "https://yourdomain.com/payment-response",
+      site_redirect_url: "https://swift-agentic-zeenah-yusufs-projects.vercel.app/payment-response",
       amount: total * 100, // amount in kobo
       currency: 566,       // NGN ISO code
       onComplete: (response: any) => {
@@ -65,7 +65,7 @@ export function PaymentPopup({ open, onClose, total, onComplete }: PaymentPopupP
         ) : (
           <div className="space-y-4">
             <Button className="w-full" onClick={handlePay}>
-              Pay ₦{total.toFixed(2)} with Interswitch (Test)
+              Pay ₦{total.toFixed(2)} with Interswitch
             </Button>
             {message && <p className="mt-2 text-sm text-red-500">{message}</p>}
           </div>
