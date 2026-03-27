@@ -13,11 +13,11 @@ interface PaymentPopupProps {
   open: boolean;
   onClose: () => void;
   total: number;
-  onComplete: () => void;
+  onComplete: (txnRef: string) => void;
   customerId: string;
 }
 
-export function PaymentPopup({ open, onClose, total, onComplete, customerId }: PaymentPopupProps) {
+export function PaymentPopup({ open, onClose, total, onComplete }: PaymentPopupProps) {
   const [done, setDone] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -25,19 +25,19 @@ export function PaymentPopup({ open, onClose, total, onComplete, customerId }: P
     const txnRef = `txn_${Date.now()}`;
 
     const paymentRequest = {
-      merchant_code: "MX21696",       // test merchant code
-      pay_item_id: "4177785",         // test pay item id
+      merchant_code: import.meta.env.VITE_INTERSWITCH_MERCHANT_CODE,
+      pay_item_id: import.meta.env.VITE_INTERSWITCH_PAY_ITEM_ID,
       txn_ref: txnRef,
       site_redirect_url: "https://yourdomain.com/payment-response",
-      amount: total * 100,            // amount in kobo (₦1000 = 100000)
-      currency: 566,                  // NGN ISO code
+      amount: total * 100, // amount in kobo
+      currency: 566,       // NGN ISO code
       onComplete: (response: any) => {
         console.log("Payment response:", response);
         if (response.ResponseCode === "00") {
           setDone(true);
           setMessage("Payment successful!");
           setTimeout(() => {
-            onComplete();
+            onComplete(txnRef);
             setDone(false);
           }, 1500);
         } else {
