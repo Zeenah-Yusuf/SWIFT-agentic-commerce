@@ -7,7 +7,6 @@ export default async function handler(req, res) {
 
   const { reference, amount } = req.query;
 
-  // Load credentials from environment variables
   const merchantCode = process.env.VITE_INTERSWITCH_MERCHANT_CODE;
   const clientId = process.env.INTERSWITCH_CLIENT_ID;
   const secret = process.env.INTERSWITCH_SECRET;
@@ -17,7 +16,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const url = `https://qa.interswitchng.com/collections/api/v1/gettransaction.json?merchantcode=${merchantCode}&transactionreference=${reference}&amount=${amount}`;
+    const url = `https://webpay.qa.interswitchng.com/collections/api/v1/gettransaction.json?merchantcode=${merchantCode}&transactionreference=${reference}&amount=${amount}`;
 
     const response = await axios.get(url, {
       headers: {
@@ -26,7 +25,11 @@ export default async function handler(req, res) {
       },
     });
 
-    res.status(200).json(response.data);
+    // Inline verification response
+    res.status(200).json({
+      success: true,
+      data: response.data,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
