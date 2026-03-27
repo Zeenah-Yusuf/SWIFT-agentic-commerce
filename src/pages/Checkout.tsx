@@ -1,5 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { useCart } from "@/contexts/CartContext";
+import { formatNaira } from "@/data/mock-products";
 import { useAuth } from "@/contexts/AuthContext";
 import { PaymentPopup } from "@/components/checkout/PaymentPopup";
 import { Button } from "@/components/ui/button";
@@ -103,7 +104,7 @@ export default function Checkout() {
                         {item.name} ×{item.quantity}
                       </span>
                       <span className="font-medium text-foreground">
-                        ₦{(item.price * item.quantity).toFixed(2)}
+                        {formatNaira(item.price * item.quantity)}
                       </span>
                     </div>
                   ))}
@@ -111,7 +112,7 @@ export default function Checkout() {
                 <hr className="my-4 border-border" />
                 <div className="flex items-center justify-between">
                   <span className="font-display font-semibold text-foreground">Total</span>
-                  <span className="font-display text-xl font-bold text-primary">₦{total.toFixed(2)}</span>
+                  <span className="font-display text-xl font-bold text-primary">{formatNaira(total)}</span>
                 </div>
 
                 <div className="mt-3 text-xs text-muted-foreground">

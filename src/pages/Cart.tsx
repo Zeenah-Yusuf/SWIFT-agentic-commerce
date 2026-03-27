@@ -2,6 +2,7 @@ import { Layout } from "@/components/layout/Layout";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus, ShoppingCart, ArrowRight } from "lucide-react";
+import { formatNaira } from "@/data/mock-products";
 import { Link } from "react-router-dom";
 
 export default function Cart() {
@@ -50,7 +51,7 @@ export default function Cart() {
                     <Plus className="h-3 w-3" />
                   </Button>
                 </div>
-                <span className="w-20 text-right font-display font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</span>
+                <span className="w-20 text-right font-display font-bold text-primary">{formatNaira(item.price * item.quantity)}</span>
                 <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => removeItem(item.id)}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -61,7 +62,7 @@ export default function Cart() {
           <div className="mt-8 rounded-xl border bg-card p-6">
             <div className="flex items-center justify-between">
               <span className="font-display text-lg font-semibold text-foreground">Total</span>
-              <span className="font-display text-2xl font-bold text-primary">${total.toFixed(2)}</span>
+              <span className="font-display text-2xl font-bold text-primary">{formatNaira(total)}</span>
             </div>
             <Link to="/checkout">
               <Button className="mt-4 w-full gap-2" size="lg">Proceed to Checkout <ArrowRight className="h-4 w-4" /></Button>

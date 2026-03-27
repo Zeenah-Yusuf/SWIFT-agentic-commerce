@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Bot, User, ShoppingCart, Sparkles } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { hackathonProducts, getRecommendedCart, Product } from "@/data/mock-products";
+import { hackathonProducts, getRecommendedCart, Product, formatNaira } from "@/data/mock-products";
 import { useToast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,12 +20,12 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 const initialMessages: Message[] = [
   {
     role: "assistant",
-    content: "👋 Hey! I'm your SWIFT shopping agent.\n\nTell me what you're planning and I'll find the best products across multiple retailers, rank them transparently, and build your cart.\n\n**Try:** *\"I'm hosting a hackathon for 60 people, budget $400\"*",
+    content: "👋 Hey! I'm your SWIFT shopping agent.\n\nTell me what you're planning and I'll find the best products across Nigerian retailers, rank them transparently, and build your cart.\n\n**Try:** *\"I'm hosting a hackathon for 60 people, budget ₦200,000\"*",
   },
 ];
 
 const quickPrompts = [
-  "I'm hosting a hackathon for 60 people, budget $400",
+  "I'm hosting a hackathon for 60 people, budget ₦200,000",
   "Why is this ranked #1?",
   "Find a cheaper setup",
   "What about delivery?",
@@ -130,7 +130,7 @@ export default function Agent() {
 
     const lower = assistantSoFar.toLowerCase();
     if (lower.includes("snack") || lower.includes("badge") || lower.includes("prize") || lower.includes("recommend")) {
-      const recommended = getRecommendedCart(400, 5);
+      const recommended = getRecommendedCart(200000, 5);
       setMessages((prev) =>
         prev.map((m, i) => (i === prev.length - 1 ? { ...m, products: recommended } : m))
       );
@@ -222,7 +222,7 @@ export default function Agent() {
                               )}
                             </div>
                             <div className="text-right shrink-0">
-                              <p className="font-bold text-primary">${p.price.toFixed(2)}</p>
+                              <p className="font-bold text-primary">{formatNaira(p.price)}</p>
                               <Button size="sm" variant="outline" className="mt-1 h-7 rounded-lg text-xs" onClick={() => { addItem(p); toast({ title: `Added ${p.name}` }); }}>
                                 <ShoppingCart className="mr-1 h-3 w-3" /> Add
                               </Button>
