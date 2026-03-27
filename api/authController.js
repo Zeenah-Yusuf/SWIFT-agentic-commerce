@@ -1,4 +1,4 @@
-import { initiatePayment } from "./interswitchPayment";
+import { initiatePayment } from "./getTransaction";
 // import { sendVerificationCode } from "./whatsappVerification";
 
 export default async function handler(req, res) {
