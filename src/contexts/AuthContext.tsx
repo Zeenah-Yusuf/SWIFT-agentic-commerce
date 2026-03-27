@@ -13,25 +13,18 @@ interface AuthContextType {
   user: UserProfile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ error?: string }>;
-  signup: (name: string, email: string, password: string) => Promise<{ error?: string }>;
-  adminLogin: (code: string) => Promise<boolean>;
+  signup: (name: string, email: string, password: string, adminCode?: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-async function checkIsAdmin(userId: string): Promise<boolean> {
-  const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
-  return !!data;
-}
-
 async function buildProfile(su: SupaUser): Promise<UserProfile> {
-  const isAdmin = await checkIsAdmin(su.id);
   return {
     id: su.id,
     name: su.user_metadata?.full_name || su.email?.split("@")[0] || "User",
     email: su.email || "",
-    isAdmin,
+    isAdmin: su.user_metadata?.isAdmin === true,
   };
 }
 
@@ -67,38 +60,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {};
   };
 
-  const signup = async (name: string, email: string, password: string) => {
+  const signup = async (name: string, email: string, password: string, adminCode?: string) => {
+    const isAdmin = adminCode === "SWIFTOIZ2026";
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: name } },
+      options: {
+        data: { full_name: name, isAdmin },
+        emailRedirectTo: "https://swift-agentic-commerce.vercel.app/login"
+      },
     });
+
     if (error) return { error: error.message };
     return {};
-  };
-
-  const adminLogin = async (code: string) => {
-    if (code !== "SWIFTOIZ2026") return false;
-    // Admin login uses a pre-set admin account
-    const { error } = await supabase.auth.signInWithPassword({
-      email: "admin@swiftcommerce.app",
-      password: "SWIFTOIZ2026admin!",
-    });
-    if (error) {
-      // If admin account doesn't exist, create it
-      const { error: signupErr } = await supabase.auth.signUp({
-        email: "admin@swiftcommerce.app",
-        password: "SWIFTOIZ2026admin!",
-        options: { data: { full_name: "Admin" } },
-      });
-      if (signupErr) return false;
-      // Assign admin role
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        await supabase.from("user_roles").insert({ user_id: session.user.id, role: "admin" } as any);
-      }
-    }
-    return true;
   };
 
   const logout = async () => {
@@ -107,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, adminLogin, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
       {children}
     </AuthContext.Provider>
   );
