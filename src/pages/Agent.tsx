@@ -20,7 +20,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 const initialMessages: Message[] = [
   {
     role: "assistant",
-    content: "👋 Hey! I'm your SWIFT shopping agent.\n\nTell me what you're planning and I'll find the best products across multiple retailers, rank them transparently, and build your cart.\n\n**Try:** *\"I'm hosting a hackathon for 60 people, budget $400\"*",
+    content: "👋 Hey! I'm your SWIFT shopping agent.\n\nTell me what you're planning and I'll find the best products across Nigerian retailers, rank them transparently, and build your cart.\n\n**Try:** *\"I'm hosting a hackathon for 60 people, budget ₦200,000\"*",
   },
 ];
 
