@@ -96,7 +96,6 @@ export default function Checkout() {
                         <img src={item.image} alt={item.name} className="h-8 w-8 rounded object-cover" />
                         {item.name} ×{item.quantity}
                       </span>
-                      </span>
                       <span className="font-medium text-foreground">
                         ${(item.price * item.quantity).toFixed(2)}
                       </span>
