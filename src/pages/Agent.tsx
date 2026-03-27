@@ -130,7 +130,7 @@ export default function Agent() {
 
     const lower = assistantSoFar.toLowerCase();
     if (lower.includes("snack") || lower.includes("badge") || lower.includes("prize") || lower.includes("recommend")) {
-      const recommended = getRecommendedCart(400, 5);
+      const recommended = getRecommendedCart(200000, 5);
       setMessages((prev) =>
         prev.map((m, i) => (i === prev.length - 1 ? { ...m, products: recommended } : m))
       );
