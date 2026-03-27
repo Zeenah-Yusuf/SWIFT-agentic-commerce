@@ -2,6 +2,7 @@ import { Layout } from "@/components/layout/Layout";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Trash2, Plus, Minus, ShoppingCart, ArrowRight } from "lucide-react";
+import { formatNaira } from "@/data/mock-products";
 import { Link } from "react-router-dom";
 
 export default function Cart() {
