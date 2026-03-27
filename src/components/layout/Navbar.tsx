@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingCart, Menu, User, Zap, LogOut } from "lucide-react";
+import { ShoppingCart, Menu, User, LogOut } from "lucide-react";
+import swiftLogo from "@/assets/swift-logo.png";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
