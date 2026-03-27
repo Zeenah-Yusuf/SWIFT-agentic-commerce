@@ -1,5 +1,6 @@
 import { Layout } from "@/components/layout/Layout";
 import { useCart } from "@/contexts/CartContext";
+import { formatNaira } from "@/data/mock-products";
 import { useAuth } from "@/contexts/AuthContext";
 import { PaymentPopup } from "@/components/checkout/PaymentPopup";
 import { Button } from "@/components/ui/button";
